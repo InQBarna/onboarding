@@ -14,6 +14,7 @@ enum OnboardingStep: Int, CaseIterable {
     case login
     case whatsNew
     case push
+//    case custom(stepsIdentifiers: [String])
 
     struct FileConstants {
         static let onboardingStoryName = "Onboarding"
@@ -46,6 +47,14 @@ enum OnboardingStep: Int, CaseIterable {
     }
 
     func viewController(action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
+        let customVC = OnboardingConfiguration().customViewController(forStep: self, action: { (step, actionResponse) in
+            action(step, actionResponse)
+        })
+
+        return customVC ?? defaultViewController(action: action)
+    }
+
+    func defaultViewController(action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
         switch self {
         case .blocking:
             return OnboardingSceneBuilder.blockingVersionVC() // No action to respond to here..
@@ -62,8 +71,8 @@ enum OnboardingStep: Int, CaseIterable {
             }
         case .login:
             let isLoginBlocking = OnboardingConfiguration().isOnboardingLoginBlocking
-            return OnboardingSceneBuilder.loginBenefitsVC(blocking: isLoginBlocking) { accepted in
-                action(self, accepted)
+            return OnboardingSceneBuilder.loginBenefitsVC(blocking: isLoginBlocking) { loginAction in
+                action(self, loginAction)
             }
         }
 

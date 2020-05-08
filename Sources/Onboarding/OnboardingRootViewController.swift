@@ -3,12 +3,27 @@ import UIKit
 import WhatsNewKit
 
 class OnboardingRootViewController: UIViewController {
-    @IBOutlet var containerView: UIView!
-    @IBOutlet var pageControl: UIPageControl!
-
     var steps = [OnboardingStep]()
     private var activeStep = 0
     private var wasRoutedToSettings = false
+
+    struct Constants {
+        static let containerPaddings = UIEdgeInsets(top: 25, left: 8, bottom: 0, right: 8)
+        static let pageControlBottomPadding: CGFloat = 8
+    }
+
+    private lazy var containerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
+    private lazy var pageControl: UIPageControl = {
+        let control = UIPageControl()
+        control.translatesAutoresizingMaskIntoConstraints = false
+        return control
+    }()
 
     #warning("TODO: Recover")
 //    private var authHandler: GGLVAuthPresentationHandler? //retain for the ASWebAuthenticationSession to work properly
@@ -23,6 +38,7 @@ class OnboardingRootViewController: UIViewController {
         super.viewDidLoad()
 
         setupView()
+        setupConstraints()
 
         displayActiveStep()
 
@@ -34,16 +50,32 @@ class OnboardingRootViewController: UIViewController {
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+        return OnboardingConfiguration().statusBarStyle ?? .default
     }
 
     private func setupView() {
         view.backgroundColor = OnboardingConfiguration().backgroundColor
 
+        [pageControl, containerView].forEach {
+            view.addSubview($0)
+        }
+
         pageControl.numberOfPages = steps.count
         pageControl.currentPage = activeStep
 
         OnboardingConfiguration().configureNavBar()
+    }
+
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            containerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: Constants.containerPaddings.left),
+            containerView.topAnchor.constraint(equalTo: view.topAnchor, constant: Constants.containerPaddings.top),
+            containerView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: Constants.containerPaddings.right),
+            containerView.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: Constants.containerPaddings.bottom),
+
+            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            pageControl.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: Constants.pageControlBottomPadding)
+        ])
     }
 
     private func addObservers() {
@@ -148,22 +180,25 @@ class OnboardingRootViewController: UIViewController {
     }
 
     private func makeViewController(at index: Int) -> UIViewController? {
-        return steps[index].viewController { step, actionSelected in
+        let step = steps[index]
+
+        #warning("TODO: How could we change this Any to some concrete type? ")
+        let action: ((OnboardingStep, Any) -> Void) = { (step, response) in
             switch step {
             case .whatsNew:
                 #warning("TODO: Recover call? Or at least create some handler for it")
-//                GGAnalyticsManager.shared()?.trackEvent(
-//                    withCategory: AnalyticsTagger.categoryString(for: .navigation),
-//                    action: AnalyticsTagger.actionString(for: .flechaInferior),
-//                    label: AnalyticsTagger.labelString(for: .next),
-//                    value: nil
-//                )
+                //                GGAnalyticsManager.shared()?.trackEvent(
+                //                    withCategory: AnalyticsTagger.categoryString(for: .navigation),
+                //                    action: AnalyticsTagger.actionString(for: .flechaInferior),
+                //                    label: AnalyticsTagger.labelString(for: .next),
+                //                    value: nil
+                //                )
                 self.moveToNextStep()
             case .push:
                 assert(OnboardingConfiguration().shouldRegisterForPush)
                 self.displayAlertsConfiguration()
             case .login:
-                guard let action = actionSelected as? LoginBenefitsAction else {
+                guard let action = response as? LoginBenefitsAction else {
                     assertionFailure("should have returned a LoginBenefitsAction")
                     return
                 }
@@ -174,18 +209,20 @@ class OnboardingRootViewController: UIViewController {
                     self.displayRegister()
                 case .remindLater:
                     #warning("TODO: Recover call? Or at least create some handler for it")
-//                    GGAnalyticsManager.shared()?.trackEvent(
-//                        withCategory: AnalyticsTagger.categoryString(for: .signwall),
-//                        action: AnalyticsTagger.actionString(for: .later),
-//                        label: nil,
-//                        value: nil
-//                    )
+                    //                    GGAnalyticsManager.shared()?.trackEvent(
+                    //                        withCategory: AnalyticsTagger.categoryString(for: .signwall),
+                    //                        action: AnalyticsTagger.actionString(for: .later),
+                    //                        label: nil,
+                    //                        value: nil
+                    //                    )
                     self.moveToNextStep()
                 }
             case .blocking:
                 assertionFailure("should not have reached this")
             }
         }
+
+        return OnboardingConfiguration().customViewController(forStep: step, action: action) ?? step.defaultViewController(action: action)
     }
 
     private func displayAlertsConfiguration() {

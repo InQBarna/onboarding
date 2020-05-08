@@ -51,19 +51,12 @@ class OnboardingSceneBuilder {
         )
     }
 
-    static func loginBenefitsVC(blocking _: Bool, action _: @escaping ((LoginBenefitsAction) -> Void)) -> LoginBenefitsViewController {
-        #warning("TODO: Make this external and agnostic.. just ask for custom screen?!")
-//        let story = UIStoryboard(name: "Onboarding", bundle: nil)
-//        guard let loginBenefitsVC = story.instantiateViewController(withIdentifier: "LoginBenefitsVC") as? LoginBenefitsViewController else {
-//            assertionFailure("Should be able to load from storyboard")
-//            return LoginBenefitsViewController()
-//        }
-//
-//        loginBenefitsVC.isBlocking = blocking
-//        loginBenefitsVC.action = action
+    static func loginBenefitsVC(blocking: Bool, action: @escaping ((LoginBenefitsAction) -> Void)) -> OnboardingLoginBenefitsViewController {
+        let loginBenefitsVC = OnboardingLoginBenefitsViewController()
+        loginBenefitsVC.isBlocking = blocking
+        loginBenefitsVC.action = action
 
-        return loginBenefitsVC(blocking: true) { _ in
-        }
+        return loginBenefitsVC
     }
 
     static func blockingVersionVC() -> WhatsNewViewController {
@@ -129,7 +122,6 @@ class OnboardingSceneBuilder {
         }
 
         configuration.apply(theme: myTheme)
-
         configuration.apply(animation: .slideUp)
 
         configuration.completionButton.action = .custom(action: { _ in

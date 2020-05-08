@@ -1,13 +1,14 @@
 import UIKit
 
-public class Onboarding {
+public class Onboarding: NSObject {
     private var activeSteps: [OnboardingStep]?
 
-    public init() {}
+    public override init() {
+        super.init()
+    }
 
     public func shouldPresent(_ completion: @escaping ((Bool) -> Void)) {
         let isOnboardingForcedByActiveSteps = {
-            print("activeSteps = \(String(describing: self.activeSteps))")
             guard let activeStepsForcingOnboard = self.activeSteps?.filter({
                 $0.forcesOnboardDisplay()
             }) else {
@@ -24,6 +25,23 @@ public class Onboarding {
         } else {
             isOnboardingForcedByActiveSteps()
         }
+    }
+
+    public func present(over vc: UIViewController) {
+        let onboardingNavController = onboardingRootNavigationController()
+
+        if vc.view.traitCollection.horizontalSizeClass == .compact {
+            onboardingNavController.modalPresentationStyle = .fullScreen
+        } else {
+            self.configurePopoverPresentation(onboardingNavController, over: vc)
+        }
+
+        #warning("TODO: Inform on finish")
+//        onboardingRootVC.onFinishOnboarding = {
+//            self.moveOnFromOnboarding()
+//        }
+
+        vc.present(onboardingNavController, animated: true, completion: nil)
     }
 
     func calculateActiveSteps(_ completion: @escaping (() -> Void)) {
@@ -50,16 +68,39 @@ public class Onboarding {
         }
     }
 
-    func onboardingRootNavigationController() -> UINavigationController? {
-        guard let activeSteps = activeSteps else {
-            assertionFailure("should have called calculateActiveSteps first and have waited for a result")
-            return nil
-        }
-        let onboardingStoryboard = UIStoryboard(name: "Onboarding", bundle: nil)
-        let rootVC = onboardingStoryboard.instantiateInitialViewController() as! UINavigationController
-        let onboardingRootVC = rootVC.viewControllers.first as! OnboardingRootViewController
+    private func onboardingRootNavigationController() -> UINavigationController {
+        let onboardingRootVC = OnboardingRootViewController()
+        onboardingRootVC.steps = activeSteps ?? []
 
-        onboardingRootVC.steps = activeSteps
-        return rootVC
+        let navController = UINavigationController(rootViewController: onboardingRootVC)
+
+        return navController
+    }
+
+    private func configurePopoverPresentation(_ vc: UIViewController, over: UIViewController) {
+        vc.modalPresentationStyle = .popover
+        vc.popoverPresentationController?.sourceView = over.view
+        vc.popoverPresentationController?.sourceRect = CGRect(x: (over.view.bounds.midX ?? 0.0), y: (over.view.bounds.midY ?? 0.0), width: 0.0, height: 0.0)
+        vc.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection()
+        vc.popoverPresentationController?.delegate = self
+
+        vc.preferredContentSize = CGSize(width: 600.0, height: 800.0)
+    }
+
+}
+
+extension Onboarding: UIPopoverPresentationControllerDelegate {
+    public func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
+        return false
+    }
+
+    public func popoverPresentationController(_ popoverPresentationController: UIPopoverPresentationController, willRepositionPopoverTo rect: UnsafeMutablePointer<CGRect>, in view: AutoreleasingUnsafeMutablePointer<UIView>) {
+        let preferredContentSize = popoverPresentationController.presentedViewController.preferredContentSize
+        let viewFrame = popoverPresentationController.presentingViewController.view.frame
+        rect.pointee = CGRect(
+            x: viewFrame.midX - preferredContentSize.width / 2.0,
+            y: viewFrame.midY - preferredContentSize.height / 2.0,
+            width: preferredContentSize.width,
+            height: preferredContentSize.height)
     }
 }

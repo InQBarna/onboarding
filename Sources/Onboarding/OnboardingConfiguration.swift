@@ -22,15 +22,17 @@ struct OnboardingConfiguration {
 
     var shouldRegisterForPush: Bool = true
     var shouldDisplayLogin: Bool = true
-    var isOnboardingLoginBlocking: Bool = true
+    var isOnboardingLoginBlocking: Bool = false
     var firstInstallWhatsNewJsonName: String = "WhatsNewCleanInstall"
 
     var minVersion: String = "1.0.0"
 
     var onboardingTopImage: UIImage?
 
+    var statusBarStyle: UIStatusBarStyle?
+
     func backgroundColor(forStep _: OnboardingStep) -> UIColor {
-        return .white
+        return .blue
         /*
          switch self {
          case .login:
@@ -43,6 +45,10 @@ struct OnboardingConfiguration {
 
     func configureNavBar() {
         #warning("TODO:")
+    }
+
+    func customViewController(forStep step: OnboardingStep, action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
+        return nil
     }
 
 //    configuration.itemsView.imageSize = .original
