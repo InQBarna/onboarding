@@ -6,35 +6,38 @@
 //  Copyright © 2019 GrupoGodo. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import WhatsNewKit
 
 typealias PrimaryActionSelected = Bool
 
 class OnboardingSceneBuilder {
     static func whatsNewVC(for whatsNew: WhatsNew, action: @escaping (() -> Void)) -> WhatsNewViewController? {
-
-        GGAnalyticsManager.shared().trackPage(
-            withScreenName: AnalyticsTagger.screenNameString(for: .onboardingWhatsNew),
-            dataLayer: [:])
+        #warning("TODO: Recover call? Or at least create some handler for it")
+//        GGAnalyticsManager.shared().trackPage(
+//            withScreenName: AnalyticsTagger.screenNameString(for: .onboardingWhatsNew),
+//            dataLayer: [:])
 
         return WhatsNewViewController(
             whatsNew: whatsNew,
             configuration: defaultCustomizedConfiguration(action),
-            versionStore: WhatsNewVersionUserDefaultsStore())
+            versionStore: WhatsNewVersionUserDefaultsStore()
+        )
     }
 
     static func activatePushInfoVC(action: @escaping ((PrimaryActionSelected) -> Void)) -> WhatsNewViewController {
-
+        #warning("TODO: Make this external and agnostic.. just asking for default screen customization?!")
         let completionButtonTitle = "Configurar Alertas"
         let items: [WhatsNew.Item] = [WhatsNew.Item(
             title: "Activa",
             subtitle: "Selecciona las secciones y autores sobre los que quieres recibir notificaciones",
-            image: nil)]
+            image: nil
+        )]
 
         let pushInfo = WhatsNew(
             title: "Alertas",
-            items: items)
+            items: items
+        )
 
         var configuration = defaultCustomizedConfiguration {
             action(true)
@@ -44,27 +47,32 @@ class OnboardingSceneBuilder {
 
         return WhatsNewViewController(
             whatsNew: pushInfo,
-            configuration: configuration)
+            configuration: configuration
+        )
     }
 
-    static func loginBenefitsVC(blocking: Bool, action: @escaping ((LoginBenefitsAction) -> Void)) -> LoginBenefitsViewController {
-        let story = UIStoryboard(name: "Onboarding", bundle: nil)
-        guard let loginBenefitsVC = story.instantiateViewController(withIdentifier: "LoginBenefitsVC") as? LoginBenefitsViewController else {
-            assertionFailure("Should be able to load from storyboard")
-            return LoginBenefitsViewController()
-        }
+    static func loginBenefitsVC(blocking _: Bool, action _: @escaping ((LoginBenefitsAction) -> Void)) -> LoginBenefitsViewController {
+        #warning("TODO: Make this external and agnostic.. just ask for custom screen?!")
+//        let story = UIStoryboard(name: "Onboarding", bundle: nil)
+//        guard let loginBenefitsVC = story.instantiateViewController(withIdentifier: "LoginBenefitsVC") as? LoginBenefitsViewController else {
+//            assertionFailure("Should be able to load from storyboard")
+//            return LoginBenefitsViewController()
+//        }
+//
+//        loginBenefitsVC.isBlocking = blocking
+//        loginBenefitsVC.action = action
 
-        loginBenefitsVC.isBlocking = blocking
-        loginBenefitsVC.action = action
-        
-        return loginBenefitsVC
+        return loginBenefitsVC(blocking: true) { _ in
+        }
     }
 
     static func blockingVersionVC() -> WhatsNewViewController {
         let appVersion = Bundle.main.currentAppVersion ?? "-"
-        let minVersion = GGSettingsManager.shared().minIOSVersion()
 
-        let message = String(format: NSLocalizedString("La versión de la aplicación %@ ya no está soportada. Por favor, actualiza a la versión %@ o superior.", comment: "") , arguments: [appVersion, minVersion])
+        #warning("TODO: Make this external")
+        let minVersion = OnboardingConfiguration().minVersion
+
+        let message = String(format: NSLocalizedString("La versión de la aplicación %@ ya no está soportada. Por favor, actualiza a la versión %@ o superior.", comment: ""), arguments: [appVersion, minVersion])
 
         let info = WhatsNew(
             title: NSLocalizedString("Actualización recomendada", comment: ""),
@@ -72,8 +80,10 @@ class OnboardingSceneBuilder {
                 WhatsNew.Item(
                     title: "",
                     subtitle: message,
-                    image: nil)
-        ])
+                    image: nil
+                ),
+            ]
+        )
 
         var configuration = defaultCustomizedConfiguration {
             OnboardingSceneBuilder.launchAppStore()
@@ -82,11 +92,13 @@ class OnboardingSceneBuilder {
 
         return WhatsNewViewController(
             whatsNew: info,
-            configuration: configuration)
+            configuration: configuration
+        )
     }
 
     static func launchAppStore() {
-        guard let appStoreURL = URL(string: Customization.flavor().appStoreAppURLString()) else {
+        #warning("TODO: Make this external")
+        guard let appStoreURL = URL(string: "itms-apps://itunes.apple.com/es/app/id364587804") else {
             assertionFailure()
             return
         }
@@ -97,21 +109,22 @@ class OnboardingSceneBuilder {
         var configuration = WhatsNewViewController.Configuration()
 
         let myTheme = WhatsNewViewController.Theme { configuration in
-            configuration.backgroundColor = Customization.flavor().onboardingBackgroundColor()
-            configuration.titleView.titleColor = Customization.flavor().onboardingTitleColor()
-            configuration.titleView.titleFont = Customization.flavor().onboardingTitleFont()
+            let onboardingConfig = OnboardingConfiguration()
+            configuration.backgroundColor = onboardingConfig.backgroundColor
+            configuration.titleView.titleColor = onboardingConfig.titleColor
+            configuration.titleView.titleFont = onboardingConfig.titleFont
 
-            configuration.itemsView.titleFont = Customization.flavor().primaryOnboardingFont()
-            configuration.itemsView.titleColor = Customization.flavor().onboardingPrimaryTextColor()
-            configuration.itemsView.subtitleFont = Customization.flavor().secondaryOnboardingFont()
-            configuration.itemsView.subtitleColor = Customization.flavor().onboardingSecondaryTextColor()
+            configuration.itemsView.titleFont = onboardingConfig.primaryFont
+            configuration.itemsView.titleColor = onboardingConfig.primaryTextColor
+            configuration.itemsView.subtitleFont = onboardingConfig.secondaryFont
+            configuration.itemsView.subtitleColor = onboardingConfig.secondaryTextColor
             configuration.itemsView.imageSize = .original
             configuration.itemsView.autoTintImage = true
 
-            configuration.completionButton.backgroundColor = Customization.flavor().onboardingCompletionButtonBackgroundColor()
-            configuration.completionButton.titleColor = Customization.flavor().onboardingCompletionButtonTitleColor()
-            configuration.completionButton.titleFont = Customization.flavor().primaryOnboardingFont()
-            configuration.completionButton.insets = UIEdgeInsets(top: 5, left: 23.5, bottom: 11.5, right: 23.5)
+            configuration.completionButton.backgroundColor = onboardingConfig.completionButtonBackgroundColor
+            configuration.completionButton.titleColor = onboardingConfig.completionButtonTitleColor
+            configuration.completionButton.titleFont = onboardingConfig.completionButtonTitleFont
+            configuration.completionButton.insets = onboardingConfig.completionButtonInsets
             configuration.completionButton.title = NSLocalizedString("Continúa", comment: "")
         }
 
@@ -125,5 +138,4 @@ class OnboardingSceneBuilder {
 
         return configuration
     }
-
 }

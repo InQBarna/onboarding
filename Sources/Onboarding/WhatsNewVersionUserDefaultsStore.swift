@@ -10,7 +10,6 @@ import Foundation
 import WhatsNewKit
 
 struct WhatsNewVersionUserDefaultsStore: WhatsNewVersionStore {
-
     struct Constants {
         static let versionNumberDefaultsKey = "com.grupoGodo.whatsnewDisplay.version"
     }
@@ -26,6 +25,4 @@ struct WhatsNewVersionUserDefaultsStore: WhatsNewVersionStore {
     func set(version: WhatsNew.Version) {
         UserDefaults.standard.set(true, forKey: defaultsKey(for: version))
     }
-
-
 }

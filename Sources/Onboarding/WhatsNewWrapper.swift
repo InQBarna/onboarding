@@ -10,7 +10,6 @@ import UIKit
 import WhatsNewKit
 
 struct WhatsNewWithImageStrings: Codable, Equatable, Hashable {
-
     struct WhatsNewWithImageStringsItem: Codable, Equatable, Hashable {
         let title: String
         let subtitle: String
@@ -24,7 +23,7 @@ struct WhatsNewWithImageStrings: Codable, Equatable, Hashable {
             guard let madeImage = UIImage(named: imageName) else {
                 return nil
             }
-            
+
             return WhatsNew.Item(title: title, subtitle: subtitle, image: madeImage)
         }
     }
@@ -42,7 +41,6 @@ struct WhatsNewWithImageStrings: Codable, Equatable, Hashable {
     }
 
     func toWhatsNew() -> WhatsNew? {
-        return WhatsNew(version: version, title: title, items: items.compactMap({ $0.toWhatsNewItem() }))
+        return WhatsNew(version: version, title: title, items: items.compactMap { $0.toWhatsNewItem() })
     }
-
 }

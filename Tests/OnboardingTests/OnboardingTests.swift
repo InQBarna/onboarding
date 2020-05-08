@@ -1,5 +1,5 @@
-import XCTest
 @testable import Onboarding
+import XCTest
 
 final class OnboardingTests: XCTestCase {
     func testExample() {

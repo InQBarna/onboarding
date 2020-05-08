@@ -13,20 +13,21 @@ enum PushPermissionState {
     case denied
     case accepted
 
-    static func currentState(_ completion: @escaping ((PushPermissionState) -> Void)) {
-        if GGPushManager.sharedInstance().userHasBeenPromptedForPushPermission {
-            GGPushManager.sharedInstance().isRegisteredAndHasEnabledRemoteNotifications {
-                (enabled) in
-                DispatchQueue.main.async {
-                    if enabled {
-                        completion(.accepted)
-                    } else {
-                        completion(.denied)
-                    }
-                }
-            }
-        } else {
-            completion(.notPrompted)
-        }
+    static func currentState(_: @escaping ((PushPermissionState) -> Void)) {
+        #warning("TODO: Ask some delegate or similar about this")
+//        if GGPushManager.sharedInstance().userHasBeenPromptedForPushPermission {
+//            GGPushManager.sharedInstance().isRegisteredAndHasEnabledRemoteNotifications {
+//                (enabled) in
+//                DispatchQueue.main.async {
+//                    if enabled {
+//                        completion(.accepted)
+//                    } else {
+//                        completion(.denied)
+//                    }
+//                }
+//            }
+//        } else {
+//            completion(.notPrompted)
+//        }
     }
 }

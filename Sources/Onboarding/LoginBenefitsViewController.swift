@@ -15,13 +15,12 @@ enum LoginBenefitsAction {
 }
 
 class LoginBenefitsViewController: UIViewController {
-
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var subtitleLabel: UILabel!
-    @IBOutlet weak var continueButton: UIButton!
-    @IBOutlet weak var loginButton: UIButton!
-    @IBOutlet weak var remindLaterButton: UIButton!
-    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet var titleLabel: UILabel!
+    @IBOutlet var subtitleLabel: UILabel!
+    @IBOutlet var continueButton: UIButton!
+    @IBOutlet var loginButton: UIButton!
+    @IBOutlet var remindLaterButton: UIButton!
+    @IBOutlet var imageView: UIImageView!
 
     var action: ((LoginBenefitsAction) -> Void)?
     var isBlocking: Bool = false
@@ -35,15 +34,16 @@ class LoginBenefitsViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        GGAnalyticsManager.shared().trackPage(
-            withScreenName: AnalyticsTagger.screenNameString(for: .onboardingLoginBenefits),
-            dataLayer: [:])
-        
+        #warning("TODO: Recover call? Or at least create some handler for it")
+//        GGAnalyticsManager.shared().trackPage(
+//            withScreenName: AnalyticsTagger.screenNameString(for: .onboardingLoginBenefits),
+//            dataLayer: [:])
+
         OnboardingAnimation.animateSlidingUp([titleLabel, subtitleLabel, continueButton, remindLaterButton, loginButton])
     }
 
     private func setupView() {
-        view.backgroundColor = UIColor.magicPotion()
+        view.backgroundColor = OnboardingConfiguration().backgroundColor(forStep: .login)
 
         continueButton.layer.cornerRadius = 5
 
@@ -60,7 +60,7 @@ class LoginBenefitsViewController: UIViewController {
 
         remindLaterButton.isHidden = isBlocking
 
-        imageView.image = Customization.flavor().onboardingTopImage()
+        imageView.image = OnboardingConfiguration().onboardingTopImage
 
         [titleLabel, subtitleLabel, continueButton, remindLaterButton, loginButton].forEach {
             $0.alpha = 0.0
@@ -71,11 +71,12 @@ class LoginBenefitsViewController: UIViewController {
         if let action = action {
             action(.goToRegister)
 
-            GGAnalyticsManager.shared().trackEvent(
-                withCategory: AnalyticsTagger.categoryString(for: .signwall),
-                action: AnalyticsTagger.actionString(for: .next),
-                label: AnalyticsTagger.labelString(for: .register),
-                value: nil)
+            #warning("TODO: Recover call? Or at least create some handler for it")
+//            GGAnalyticsManager.shared().trackEvent(
+//                withCategory: AnalyticsTagger.categoryString(for: .signwall),
+//                action: AnalyticsTagger.actionString(for: .next),
+//                label: AnalyticsTagger.labelString(for: .register),
+//                value: nil)
         }
     }
 
@@ -89,13 +90,12 @@ class LoginBenefitsViewController: UIViewController {
         if let action = action {
             action(.goToLogin)
 
-            GGAnalyticsManager.shared().trackEvent(
-                withCategory: AnalyticsTagger.categoryString(for: .signwall),
-                action: AnalyticsTagger.actionString(for: .next),
-                label: AnalyticsTagger.labelString(for: .login),
-                value: nil)
-
+            #warning("TODO: Recover call? Or at least create some handler for it")
+//            GGAnalyticsManager.shared().trackEvent(
+//                withCategory: AnalyticsTagger.categoryString(for: .signwall),
+//                action: AnalyticsTagger.actionString(for: .next),
+//                label: AnalyticsTagger.labelString(for: .login),
+//                value: nil)
         }
     }
-
 }

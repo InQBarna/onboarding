@@ -9,13 +9,12 @@
 import UIKit
 
 class OnboardingAnimation {
-
-    //Same animation as the WhatsNewKit .slideUp
+    // Same animation as the WhatsNewKit .slideUp
     static func animateSlidingUp(_ views: [UIView]) {
         let delay: TimeInterval = 0.2
         views.enumerated().forEach { (
             OnboardingAnimation.animateSlidingUp($0.element, delay: delay + TimeInterval($0.offset) * 0.1)
-        )}
+        ) }
     }
 
     static func animateSlidingUp(_ view: UIView, delay: TimeInterval) {
@@ -41,7 +40,7 @@ class OnboardingAnimation {
                 view.transform = .identity
                 // Set default alpha
                 view.alpha = 1.0
-        })
+            }
+        )
     }
-
 }

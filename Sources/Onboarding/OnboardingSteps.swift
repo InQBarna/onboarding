@@ -6,7 +6,7 @@
 //  Copyright © 2019 GrupoGodo. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import WhatsNewKit
 
 enum OnboardingStep: Int, CaseIterable {
@@ -30,7 +30,7 @@ enum OnboardingStep: Int, CaseIterable {
         case .push:
             shouldDisplayAlerts(completion)
         case .login:
-            shouldDisplayLogin { (should) in
+            shouldDisplayLogin { should in
                 completion(should)
             }
         }
@@ -48,7 +48,7 @@ enum OnboardingStep: Int, CaseIterable {
     func viewController(action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
         switch self {
         case .blocking:
-            return OnboardingSceneBuilder.blockingVersionVC() //No action to respond to here..
+            return OnboardingSceneBuilder.blockingVersionVC() // No action to respond to here..
         case .whatsNew:
             if let whatsNew = whatsNewForCurrentVersion() {
                 return OnboardingSceneBuilder.whatsNewVC(for: whatsNew) {
@@ -57,11 +57,11 @@ enum OnboardingStep: Int, CaseIterable {
                 }
             }
         case .push:
-            return OnboardingSceneBuilder.activatePushInfoVC() { accepted in
+            return OnboardingSceneBuilder.activatePushInfoVC { accepted in
                 action(self, accepted)
             }
         case .login:
-            let isLoginBlocking = Customization.flavor().isOnboardingLoginBlocking()
+            let isLoginBlocking = OnboardingConfiguration().isOnboardingLoginBlocking
             return OnboardingSceneBuilder.loginBenefitsVC(blocking: isLoginBlocking) { accepted in
                 action(self, accepted)
             }
@@ -72,12 +72,7 @@ enum OnboardingStep: Int, CaseIterable {
     }
 
     func viewBackgroundColor() -> UIColor {
-        switch self {
-        case .login:
-            return UIColor.magicPotion()
-        case .blocking, .whatsNew, .push:
-            return UIColor.white
-        }
+        return OnboardingConfiguration().backgroundColor(forStep: self)
     }
 
     func hidesNavigationBar() -> Bool {
@@ -108,7 +103,7 @@ enum OnboardingStep: Int, CaseIterable {
 
         var fileName = FileConstants.whatsNewFileName + versionString
         if isFreshInstall {
-            fileName = Customization.flavor().firstInstallWhatsNewJsonName()
+            fileName = OnboardingConfiguration().firstInstallWhatsNewJsonName
         }
 
         var whatsNewWithImageString: WhatsNewWithImageStrings?
@@ -121,14 +116,15 @@ enum OnboardingStep: Int, CaseIterable {
 
         var whatsNew = whatsNewWithImageString?.toWhatsNew()
 
-        //pass correct version if it's a clean install - so it is marked as already seen by WhatsNewKit
+        // pass correct version if it's a clean install - so it is marked as already seen by WhatsNewKit
         if isFreshInstall,
             let title = whatsNew?.title,
             let items = whatsNew?.items {
             whatsNew = WhatsNew(
                 version: version,
                 title: title,
-                items: items)
+                items: items
+            )
         }
 
         return whatsNew
@@ -140,7 +136,7 @@ enum OnboardingStep: Int, CaseIterable {
     }
 
     private func shouldDisplayAlerts(_ completion: @escaping ((Bool) -> Void)) {
-        guard Customization.flavor().shouldRegisterForPush() else {
+        guard OnboardingConfiguration().shouldRegisterForPush else {
             completion(false)
             return
         }
@@ -148,17 +144,15 @@ enum OnboardingStep: Int, CaseIterable {
         completion(!StartupValues.hasVisitedAlertsVC())
     }
 
-    private func shouldDisplayLogin(completion: @escaping ((Bool) -> Void))  {
-        Customization.flavor().shouldDisplayLogin { (should) in
-            completion(should)
-        }
+    private func shouldDisplayLogin(completion: @escaping ((Bool) -> Void)) {
+        completion(OnboardingConfiguration().shouldDisplayLogin)
     }
 
     private func shouldBlockAppVersion() -> Bool {
         guard let appVersion = Bundle.main.currentAppVersion else {
             return false
         }
-        let minVersion = GGSettingsManager.shared().minIOSVersion()
+        let minVersion = OnboardingConfiguration().minVersion
         return appVersion.compare(minVersion, options: .numeric) == .orderedAscending
     }
 }
