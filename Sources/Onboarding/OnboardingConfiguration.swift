@@ -20,7 +20,6 @@ struct OnboardingConfiguration {
     var completionButtonTitleFont: UIFont = UIFont.systemFont(ofSize: 20)
     var completionButtonInsets: UIEdgeInsets = UIEdgeInsets(top: 8, left: 24, bottom: 8, right: 24)
 
-    var shouldRegisterForPush: Bool = true
     var firstInstallWhatsNewJsonName: String = "WhatsNewCleanInstall"
 
     var onboardingTopImage: UIImage?

@@ -9,18 +9,9 @@ import Foundation
 
 @objc class StartupValues: NSObject {
     struct Constants {
-        static let hasVisitedAlertsVC = "com.inqbarna.onboarding.hasVisitedAlertsVC"
         static let hasInstalledApp = "com.inqbarna.onboarding.appIsInstalled"
     }
-
-    static func hasVisitedAlertsVC() -> Bool {
-        return UserDefaults.standard.bool(forKey: Constants.hasVisitedAlertsVC)
-    }
-
-    static func markAlertsVCAsVisited() {
-        UserDefaults.standard.set(true, forKey: Constants.hasVisitedAlertsVC)
-    }
-
+    
     static func isCleanInstall() -> Bool {
         return !UserDefaults.standard.bool(forKey: Constants.hasInstalledApp)
     }

@@ -9,9 +9,10 @@
 import UIKit
 import WhatsNewKit
 
-typealias PrimaryActionSelected = Bool
+public typealias PrimaryActionSelected = Bool
+public typealias OnboardingViewController = WhatsNewViewController
 
-class OnboardingSceneBuilder {
+public class OnboardingSceneBuilder {
     static func whatsNewVC(for whatsNew: WhatsNew, action: @escaping (() -> Void)) -> WhatsNewViewController? {
         #warning("TODO: Recover call? Or at least create some handler for it")
 //        GGAnalyticsManager.shared().trackPage(
@@ -25,31 +26,7 @@ class OnboardingSceneBuilder {
         )
     }
 
-    static func activatePushInfoVC(action: @escaping ((PrimaryActionSelected) -> Void)) -> WhatsNewViewController {
-        #warning("TODO: Make this external and agnostic.. just asking for default screen customization?!")
-        let completionButtonTitle = "Configurar Alertas"
-        let items: [WhatsNew.Item] = [WhatsNew.Item(
-            title: "Activa",
-            subtitle: "Selecciona las secciones y autores sobre los que quieres recibir notificaciones",
-            image: nil
-        )]
-
-        let pushInfo = WhatsNew(
-            title: "Alertas",
-            items: items
-        )
-
-        var configuration = defaultCustomizedConfiguration {
-            action(true)
-        }
-
-        configuration.completionButton.title = completionButtonTitle
-
-        return WhatsNewViewController(
-            whatsNew: pushInfo,
-            configuration: configuration
-        )
-    }
+    
 
     static func blockingVersionVC(_ minVersion: String, appStoreUrlString: String) -> WhatsNewViewController {
         let appVersion = Bundle.main.currentAppVersion ?? "-"
@@ -87,7 +64,7 @@ class OnboardingSceneBuilder {
         UIApplication.shared.open(appStoreURL, options: [:], completionHandler: nil)
     }
 
-    static func defaultCustomizedConfiguration(_ action: @escaping (() -> Void)) -> WhatsNewViewController.Configuration {
+    public static func defaultCustomizedConfiguration(_ action: @escaping (() -> Void)) -> WhatsNewViewController.Configuration {
         var configuration = WhatsNewViewController.Configuration()
 
         let myTheme = WhatsNewViewController.Theme { configuration in

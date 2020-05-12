@@ -12,11 +12,8 @@ import WhatsNewKit
 public enum OnboardingStep: Equatable {
     case blocking(minVersion: String, appStoreUrlString: String)
     case whatsNew
-    case push
     ///provides the default (but customizable) WhatsNewKit design
-    case defaultDesign(identifier: String)
-    ///can prove whatever kind of design needed
-    case customDesign(identifier: String)
+    case custom(identifier: String, vc: UIViewController)
 
     struct FileConstants {
         static let onboardingStoryName = "Onboarding"
@@ -30,11 +27,7 @@ public enum OnboardingStep: Equatable {
             completion(shouldBlockAppVersion(minVersion))
         case .whatsNew:
             completion(shouldDisplayWhatsNew())
-        case .push:
-            shouldDisplayAlerts(completion)
-        case .defaultDesign(let identifier),
-             .customDesign(let identifier):
-            #warning("TODO: should ask some delegate or something")
+        case .custom:
             completion(true)
         }
     }
@@ -43,10 +36,7 @@ public enum OnboardingStep: Equatable {
         switch self {
         case .whatsNew, .blocking:
             return true
-        case .push:
-            return false
-        case .customDesign(let identifier), .defaultDesign(let identifier):
-            #warning("Ask someone about this")
+        case .custom:
             return true
         }
     }
@@ -62,10 +52,8 @@ public enum OnboardingStep: Equatable {
                     action(self, true)
                 }
             }
-        case .push:
-            return OnboardingSceneBuilder.activatePushInfoVC { accepted in
-                action(self, accepted)
-            }
+        case .custom(_, let vc):
+            return vc
         default:
             return nil
         }
@@ -80,9 +68,9 @@ public enum OnboardingStep: Equatable {
 
     func hidesNavigationBar() -> Bool {
         switch self {
-        case .blocking, .whatsNew, .push:
+        case .blocking, .whatsNew:
             return false
-        case .customDesign(let identifier), .defaultDesign(let identifier):
+        case .custom:
             #warning("Ask someone about this")
             return false
         }
@@ -137,15 +125,6 @@ public enum OnboardingStep: Equatable {
     private func hasDisplayedWhatsNewForCurrentVersion() -> Bool {
         let version = WhatsNew.Version.current()
         return WhatsNewVersionUserDefaultsStore().has(version: version)
-    }
-
-    private func shouldDisplayAlerts(_ completion: @escaping ((Bool) -> Void)) {
-        guard OnboardingConfiguration().shouldRegisterForPush else {
-            completion(false)
-            return
-        }
-
-        completion(!StartupValues.hasVisitedAlertsVC())
     }
 
     private func shouldBlockAppVersion(_ minVersion: String?) -> Bool {

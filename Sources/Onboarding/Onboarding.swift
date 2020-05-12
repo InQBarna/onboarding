@@ -4,6 +4,8 @@ public class Onboarding: NSObject {
     private var activeSteps: [OnboardingStep]?
     private var userSteps: [OnboardingStep]
 
+    private weak var onboardingRootViewController: OnboardingRootViewController?
+
     public init(steps: [OnboardingStep]) {
         userSteps = steps
         super.init()
@@ -14,7 +16,7 @@ public class Onboarding: NSObject {
         assertionFailure("should initalize Onboarding with some Onboarding steps")
     }
 
-    public func shouldPresent(_ completion: @escaping ((Bool) -> Void)) {
+    public func checkIfShouldPresent(_ completion: @escaping ((Bool) -> Void)) {
         let isOnboardingForcedByActiveSteps = {
             guard let activeStepsForcingOnboard = self.activeSteps?.filter({
                 $0.forcesOnboardDisplay()
@@ -34,7 +36,7 @@ public class Onboarding: NSObject {
         }
     }
 
-    public func present(over vc: UIViewController) {
+    public func present(over vc: UIViewController, finish: @escaping (() -> Void)) {
         let onboardingNavController = onboardingRootNavigationController()
 
         if vc.view.traitCollection.horizontalSizeClass == .compact {
@@ -43,12 +45,19 @@ public class Onboarding: NSObject {
             self.configurePopoverPresentation(onboardingNavController, over: vc)
         }
 
-        #warning("TODO: Inform on finish")
-//        onboardingRootVC.onFinishOnboarding = {
-//            self.moveOnFromOnboarding()
-//        }
+        onboardingRootViewController?.onFinishOnboarding = {
+            finish()
+        }
 
         vc.present(onboardingNavController, animated: true, completion: nil)
+    }
+
+    public func dismiss() {
+        onboardingRootViewController?.dismiss(animated: true, completion: nil)
+    }
+
+    public func moveToNextStep() {
+        onboardingRootViewController?.moveToNextStep()
     }
 
     func calculateActiveSteps(_ completion: @escaping (() -> Void)) {
@@ -82,6 +91,7 @@ public class Onboarding: NSObject {
         onboardingRootVC.steps = activeSteps ?? []
 
         let navController = UINavigationController(rootViewController: onboardingRootVC)
+        onboardingRootViewController = onboardingRootVC
 
         return navController
     }
