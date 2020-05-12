@@ -51,11 +51,8 @@ class OnboardingSceneBuilder {
         )
     }
 
-    static func blockingVersionVC() -> WhatsNewViewController {
+    static func blockingVersionVC(_ minVersion: String, appStoreUrlString: String) -> WhatsNewViewController {
         let appVersion = Bundle.main.currentAppVersion ?? "-"
-
-        #warning("TODO: Make this external")
-        let minVersion = OnboardingConfiguration().minVersion
 
         let message = String(format: NSLocalizedString("La versión de la aplicación %@ ya no está soportada. Por favor, actualiza a la versión %@ o superior.", comment: ""), arguments: [appVersion, minVersion])
 
@@ -71,7 +68,7 @@ class OnboardingSceneBuilder {
         )
 
         var configuration = defaultCustomizedConfiguration {
-            OnboardingSceneBuilder.launchAppStore()
+            OnboardingSceneBuilder.launchAppStore(appStoreUrlString)
         }
         configuration.completionButton.title = NSLocalizedString("Actualizar", comment: "")
 
@@ -81,9 +78,9 @@ class OnboardingSceneBuilder {
         )
     }
 
-    static func launchAppStore() {
+    static func launchAppStore(_  appStoreUrlString: String) {
         #warning("TODO: Make this external")
-        guard let appStoreURL = URL(string: "itms-apps://itunes.apple.com/es/app/id364587804") else {
+        guard let appStoreURL = URL(string: appStoreUrlString) else {
             assertionFailure()
             return
         }

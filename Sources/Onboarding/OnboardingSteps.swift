@@ -10,7 +10,7 @@ import UIKit
 import WhatsNewKit
 
 public enum OnboardingStep: Equatable {
-    case blocking
+    case blocking(minVersion: String, appStoreUrlString: String)
     case whatsNew
     case push
     ///provides the default (but customizable) WhatsNewKit design
@@ -26,8 +26,8 @@ public enum OnboardingStep: Equatable {
 
     func shouldDisplay(completion: @escaping ((Bool) -> Void)) {
         switch self {
-        case .blocking:
-            completion(shouldBlockAppVersion())
+        case .blocking(let minVersion, _):
+            completion(shouldBlockAppVersion(minVersion))
         case .whatsNew:
             completion(shouldDisplayWhatsNew())
         case .push:
@@ -52,17 +52,9 @@ public enum OnboardingStep: Equatable {
     }
 
     func viewController(action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
-        let customVC = OnboardingConfiguration().customViewController(forStep: self, action: { (step, actionResponse) in
-            action(step, actionResponse)
-        })
-
-        return customVC ?? defaultViewController(action: action)
-    }
-
-    func defaultViewController(action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
         switch self {
-        case .blocking:
-            return OnboardingSceneBuilder.blockingVersionVC() // No action to respond to here..
+        case .blocking(let minVersion, let appStoreString):
+            return OnboardingSceneBuilder.blockingVersionVC(minVersion, appStoreUrlString: appStoreString) // No action to respond to here..
         case .whatsNew:
             if let whatsNew = whatsNewForCurrentVersion() {
                 return OnboardingSceneBuilder.whatsNewVC(for: whatsNew) {
@@ -156,11 +148,11 @@ public enum OnboardingStep: Equatable {
         completion(!StartupValues.hasVisitedAlertsVC())
     }
 
-    private func shouldBlockAppVersion() -> Bool {
-        guard let appVersion = Bundle.main.currentAppVersion else {
+    private func shouldBlockAppVersion(_ minVersion: String?) -> Bool {
+        guard let appVersion = Bundle.main.currentAppVersion,
+            let minVersion = minVersion else {
             return false
         }
-        let minVersion = OnboardingConfiguration().minVersion
         return appVersion.compare(minVersion, options: .numeric) == .orderedAscending
     }
 }

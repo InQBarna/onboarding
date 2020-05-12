@@ -73,9 +73,14 @@ class OnboardingRootViewController: UIViewController {
             containerView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -Constants.containerPaddings.right),
             containerView.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: Constants.containerPaddings.bottom),
 
-            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            pageControl.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: Constants.pageControlBottomPadding)
+            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
+
+        if #available(iOS 11.0, *) {
+            pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Constants.pageControlBottomPadding).isActive = true
+        } else {
+            pageControl.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: Constants.pageControlBottomPadding).isActive = true
+        }
     }
 
     private func addObservers() {
@@ -188,7 +193,7 @@ class OnboardingRootViewController: UIViewController {
             }
         }
 
-        return OnboardingConfiguration().customViewController(forStep: step, action: action) ?? step.defaultViewController(action: action)
+        return step.viewController(action: action)
     }
 
     private func displayAlertsConfiguration() {

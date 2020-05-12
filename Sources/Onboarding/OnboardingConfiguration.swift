@@ -23,8 +23,6 @@ struct OnboardingConfiguration {
     var shouldRegisterForPush: Bool = true
     var firstInstallWhatsNewJsonName: String = "WhatsNewCleanInstall"
 
-    var minVersion: String = "1.0.0"
-
     var onboardingTopImage: UIImage?
 
     var statusBarStyle: UIStatusBarStyle?
@@ -38,10 +36,6 @@ struct OnboardingConfiguration {
         #warning("TODO:")
         navigationController?.navigationBar.isTranslucent = false
         
-    }
-
-    func customViewController(forStep step: OnboardingStep, action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
-        return nil
     }
 
 //    configuration.itemsView.imageSize = .original
