@@ -54,8 +54,6 @@ public enum OnboardingStep: Equatable {
             }
         case .custom(_, let vc):
             return vc
-        default:
-            return nil
         }
 
         assertionFailure("should have treated this already")
@@ -67,13 +65,7 @@ public enum OnboardingStep: Equatable {
     }
 
     func hidesNavigationBar() -> Bool {
-        switch self {
-        case .blocking, .whatsNew:
-            return false
-        case .custom:
-            #warning("Ask someone about this")
-            return false
-        }
+        return OnboardingConfiguration().hidesNavigationBar(forStep: self)
     }
 
     private func shouldDisplayWhatsNew() -> Bool {

@@ -14,11 +14,6 @@ public typealias OnboardingViewController = WhatsNewViewController
 
 public class OnboardingSceneBuilder {
     static func whatsNewVC(for whatsNew: WhatsNew, action: @escaping (() -> Void)) -> WhatsNewViewController? {
-        #warning("TODO: Recover call? Or at least create some handler for it")
-//        GGAnalyticsManager.shared().trackPage(
-//            withScreenName: AnalyticsTagger.screenNameString(for: .onboardingWhatsNew),
-//            dataLayer: [:])
-
         return WhatsNewViewController(
             whatsNew: whatsNew,
             configuration: defaultCustomizedConfiguration(action),
@@ -56,7 +51,6 @@ public class OnboardingSceneBuilder {
     }
 
     static func launchAppStore(_  appStoreUrlString: String) {
-        #warning("TODO: Make this external")
         guard let appStoreURL = URL(string: appStoreUrlString) else {
             assertionFailure()
             return

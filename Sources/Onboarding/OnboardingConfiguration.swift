@@ -34,7 +34,16 @@ struct OnboardingConfiguration {
     func configureNavBar(_ navigationController: UINavigationController?) {
         #warning("TODO:")
         navigationController?.navigationBar.isTranslucent = false
-        
+    }
+
+    func hidesNavigationBar(forStep step: OnboardingStep) -> Bool {
+        switch step {
+        case .blocking, .whatsNew:
+            return false
+        case .custom:
+            #warning("Ask someone about this")
+            return false
+        }
     }
 
 //    configuration.itemsView.imageSize = .original

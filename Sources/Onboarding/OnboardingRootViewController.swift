@@ -3,8 +3,8 @@ import UIKit
 import WhatsNewKit
 
 public class OnboardingRootViewController: UIViewController {
-    var steps = [OnboardingStep]()
-    private var activeStep = 0
+    public var steps = [OnboardingStep]()
+    public var activeStep = 0
 
     struct Constants {
         static let containerPaddings = UIEdgeInsets(top: 25, left: 8, bottom: 0, right: 8)
@@ -117,13 +117,6 @@ public class OnboardingRootViewController: UIViewController {
         let action: ((OnboardingStep, Any) -> Void) = { (step, response) in
             switch step {
             case .whatsNew:
-                #warning("TODO: Recover call? Or at least create some handler for it")
-                //                GGAnalyticsManager.shared()?.trackEvent(
-                //                    withCategory: AnalyticsTagger.categoryString(for: .navigation),
-                //                    action: AnalyticsTagger.actionString(for: .flechaInferior),
-                //                    label: AnalyticsTagger.labelString(for: .next),
-                //                    value: nil
-                //                )
                 self.moveToNextStep()
             case .blocking, .custom:
                 assertionFailure("should not have reached this")

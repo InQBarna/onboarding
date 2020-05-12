@@ -4,7 +4,7 @@ public class Onboarding: NSObject {
     private var activeSteps: [OnboardingStep]?
     private var userSteps: [OnboardingStep]
 
-    private weak var onboardingRootViewController: OnboardingRootViewController?
+    public weak var onboardingRootViewController: OnboardingRootViewController?
 
     public init(steps: [OnboardingStep]) {
         userSteps = steps
@@ -99,7 +99,7 @@ public class Onboarding: NSObject {
     private func configurePopoverPresentation(_ vc: UIViewController, over: UIViewController) {
         vc.modalPresentationStyle = .popover
         vc.popoverPresentationController?.sourceView = over.view
-        vc.popoverPresentationController?.sourceRect = CGRect(x: (over.view.bounds.midX ?? 0.0), y: (over.view.bounds.midY ?? 0.0), width: 0.0, height: 0.0)
+        vc.popoverPresentationController?.sourceRect = CGRect(x: over.view.bounds.midX, y: over.view.bounds.midY, width: 0.0, height: 0.0)
         vc.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection()
         vc.popoverPresentationController?.delegate = self
 
