@@ -16,12 +16,9 @@ struct WhatsNewWithImageStrings: Codable, Equatable, Hashable {
         let image: String?
 
         func toWhatsNewItem() -> WhatsNew.Item? {
-            guard let imageName = image else {
+            guard let imageName = image,
+                let madeImage = UIImage(named: imageName) else {
                 return WhatsNew.Item(title: title, subtitle: subtitle, image: nil)
-            }
-
-            guard let madeImage = UIImage(named: imageName) else {
-                return nil
             }
 
             return WhatsNew.Item(title: title, subtitle: subtitle, image: madeImage)

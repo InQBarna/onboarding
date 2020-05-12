@@ -21,8 +21,6 @@ struct OnboardingConfiguration {
     var completionButtonInsets: UIEdgeInsets = UIEdgeInsets(top: 8, left: 24, bottom: 8, right: 24)
 
     var shouldRegisterForPush: Bool = true
-    var shouldDisplayLogin: Bool = true
-    var isOnboardingLoginBlocking: Bool = false
     var firstInstallWhatsNewJsonName: String = "WhatsNewCleanInstall"
 
     var minVersion: String = "1.0.0"
@@ -33,18 +31,13 @@ struct OnboardingConfiguration {
 
     func backgroundColor(forStep _: OnboardingStep) -> UIColor {
         return .blue
-        /*
-         switch self {
-         case .login:
-             return UIColor.magicPotion()
-         case .blocking, .whatsNew, .push:
-             return UIColor.white
-         }
-         */
+        #warning("TODO: ask someone about this")
     }
 
-    func configureNavBar() {
+    func configureNavBar(_ navigationController: UINavigationController?) {
         #warning("TODO:")
+        navigationController?.navigationBar.isTranslucent = false
+        
     }
 
     func customViewController(forStep step: OnboardingStep, action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {

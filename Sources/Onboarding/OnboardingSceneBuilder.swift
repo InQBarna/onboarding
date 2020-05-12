@@ -51,14 +51,6 @@ class OnboardingSceneBuilder {
         )
     }
 
-    static func loginBenefitsVC(blocking: Bool, action: @escaping ((LoginBenefitsAction) -> Void)) -> OnboardingLoginBenefitsViewController {
-        let loginBenefitsVC = OnboardingLoginBenefitsViewController()
-        loginBenefitsVC.isBlocking = blocking
-        loginBenefitsVC.action = action
-
-        return loginBenefitsVC
-    }
-
     static func blockingVersionVC() -> WhatsNewViewController {
         let appVersion = Bundle.main.currentAppVersion ?? "-"
 

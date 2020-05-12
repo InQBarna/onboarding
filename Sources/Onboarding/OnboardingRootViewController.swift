@@ -63,14 +63,14 @@ class OnboardingRootViewController: UIViewController {
         pageControl.numberOfPages = steps.count
         pageControl.currentPage = activeStep
 
-        OnboardingConfiguration().configureNavBar()
+        OnboardingConfiguration().configureNavBar(navigationController)
     }
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             containerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: Constants.containerPaddings.left),
             containerView.topAnchor.constraint(equalTo: view.topAnchor, constant: Constants.containerPaddings.top),
-            containerView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: Constants.containerPaddings.right),
+            containerView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -Constants.containerPaddings.right),
             containerView.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: Constants.containerPaddings.bottom),
 
             pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -103,38 +103,20 @@ class OnboardingRootViewController: UIViewController {
     @objc private func didBecomeActive() {
         let step = steps[activeStep]
         switch step {
-        case .login, .whatsNew, .blocking:
+        case .whatsNew, .blocking:
             break
         case .push:
             if wasRoutedToSettings {
                 moveToNextStep()
             }
+        case .customDesign(let identifier), .defaultDesign(let identifier):
+            #warning("forward this to someone")
+            break
         }
 
         wasRoutedToSettings = false
     }
 
-    #warning("TODO: Recover")
-    /*
-     @objc private func authStatusChanged(_ notification: Notification) {
-         let step = steps[activeStep]
-         switch  step {
-         case .login:
-             if let data = notification.userInfo as? [String: String] {
-                 if let token = data[kUserAuthParamToken] {
-                     storeToken(token)
-                     fetchUserData()
-                     presentedViewController?.dismiss(animated: true) {
-                         self.moveToNextStep()
-                     }
-                 }
-             }
-             break
-         case .push, .whatsNew, .blocking:
-             break
-         }
-     }
-      */
     private func displayActiveStep() {
         if let firstVC = makeViewController(at: activeStep) {
             view.backgroundColor = steps[activeStep].viewBackgroundColor()
@@ -197,28 +179,12 @@ class OnboardingRootViewController: UIViewController {
             case .push:
                 assert(OnboardingConfiguration().shouldRegisterForPush)
                 self.displayAlertsConfiguration()
-            case .login:
-                guard let action = response as? LoginBenefitsAction else {
-                    assertionFailure("should have returned a LoginBenefitsAction")
-                    return
-                }
-                switch action {
-                case .goToLogin:
-                    self.displayLogin()
-                case .goToRegister:
-                    self.displayRegister()
-                case .remindLater:
-                    #warning("TODO: Recover call? Or at least create some handler for it")
-                    //                    GGAnalyticsManager.shared()?.trackEvent(
-                    //                        withCategory: AnalyticsTagger.categoryString(for: .signwall),
-                    //                        action: AnalyticsTagger.actionString(for: .later),
-                    //                        label: nil,
-                    //                        value: nil
-                    //                    )
-                    self.moveToNextStep()
-                }
             case .blocking:
                 assertionFailure("should not have reached this")
+            case .customDesign(let identifier):
+                #warning("TODO: How could we change this Any to some concrete type? ")
+            case .defaultDesign(let identifier):
+                #warning("TODO: Make a WhatsNewVC by asking for correct data somewhere")
             }
         }
 
@@ -283,16 +249,6 @@ class OnboardingRootViewController: UIViewController {
         }
 
         wasRoutedToSettings = true
-    }
-
-    private func displayLogin() {
-        #warning("TODO: Recover")
-        /*
-                authHandler = GGLVAuthPresentationHandler()
-                authHandler?.displayLogin(from: self, completion: { _ in
-                    //Do not act with the token passed back here - let the authHandler post the kUserAuthStatusChanged notification to maintain the iOS >= 12 version code as close as possible to the iOS < 12 version
-                })
-         */
     }
 
     private func displayRegister() {

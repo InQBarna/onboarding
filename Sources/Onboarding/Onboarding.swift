@@ -2,9 +2,16 @@ import UIKit
 
 public class Onboarding: NSObject {
     private var activeSteps: [OnboardingStep]?
+    private var userSteps: [OnboardingStep]
 
-    public override init() {
+    public init(steps: [OnboardingStep]) {
+        userSteps = steps
         super.init()
+    }
+
+    private override init() {
+        userSteps = []
+        assertionFailure("should initalize Onboarding with some Onboarding steps")
     }
 
     public func shouldPresent(_ completion: @escaping ((Bool) -> Void)) {
@@ -49,7 +56,7 @@ public class Onboarding: NSObject {
 
         let group = DispatchGroup()
 
-        OnboardingStep.allCases.forEach {
+        userSteps.forEach {
             group.enter()
             let step = $0
             step.shouldDisplay { isActive in
@@ -62,7 +69,9 @@ public class Onboarding: NSObject {
 
         group.notify(queue: DispatchQueue.main) {
             self.activeSteps?.sort(by: { (step1, step2) -> Bool in
-                step1.rawValue < step2.rawValue
+                let index1 = self.userSteps.firstIndex(of: step1) ?? 0
+                let index2 = self.userSteps.firstIndex(of: step2) ?? 0
+                return index1 < index2
             })
             completion()
         }

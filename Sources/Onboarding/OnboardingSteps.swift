@@ -9,12 +9,14 @@
 import UIKit
 import WhatsNewKit
 
-enum OnboardingStep: Int, CaseIterable {
+public enum OnboardingStep: Equatable {
     case blocking
-    case login
     case whatsNew
     case push
-//    case custom(stepsIdentifiers: [String])
+    ///provides the default (but customizable) WhatsNewKit design
+    case defaultDesign(identifier: String)
+    ///can prove whatever kind of design needed
+    case customDesign(identifier: String)
 
     struct FileConstants {
         static let onboardingStoryName = "Onboarding"
@@ -30,19 +32,22 @@ enum OnboardingStep: Int, CaseIterable {
             completion(shouldDisplayWhatsNew())
         case .push:
             shouldDisplayAlerts(completion)
-        case .login:
-            shouldDisplayLogin { should in
-                completion(should)
-            }
+        case .defaultDesign(let identifier),
+             .customDesign(let identifier):
+            #warning("TODO: should ask some delegate or something")
+            completion(true)
         }
     }
 
     func forcesOnboardDisplay() -> Bool {
         switch self {
-        case .login, .whatsNew, .blocking:
+        case .whatsNew, .blocking:
             return true
         case .push:
             return false
+        case .customDesign(let identifier), .defaultDesign(let identifier):
+            #warning("Ask someone about this")
+            return true
         }
     }
 
@@ -69,11 +74,8 @@ enum OnboardingStep: Int, CaseIterable {
             return OnboardingSceneBuilder.activatePushInfoVC { accepted in
                 action(self, accepted)
             }
-        case .login:
-            let isLoginBlocking = OnboardingConfiguration().isOnboardingLoginBlocking
-            return OnboardingSceneBuilder.loginBenefitsVC(blocking: isLoginBlocking) { loginAction in
-                action(self, loginAction)
-            }
+        default:
+            return nil
         }
 
         assertionFailure("should have treated this already")
@@ -86,9 +88,10 @@ enum OnboardingStep: Int, CaseIterable {
 
     func hidesNavigationBar() -> Bool {
         switch self {
-        case .login:
-            return true
         case .blocking, .whatsNew, .push:
+            return false
+        case .customDesign(let identifier), .defaultDesign(let identifier):
+            #warning("Ask someone about this")
             return false
         }
     }
@@ -151,10 +154,6 @@ enum OnboardingStep: Int, CaseIterable {
         }
 
         completion(!StartupValues.hasVisitedAlertsVC())
-    }
-
-    private func shouldDisplayLogin(completion: @escaping ((Bool) -> Void)) {
-        completion(OnboardingConfiguration().shouldDisplayLogin)
     }
 
     private func shouldBlockAppVersion() -> Bool {

@@ -10,7 +10,6 @@ import Foundation
 @objc class StartupValues: NSObject {
     struct Constants {
         static let hasVisitedAlertsVC = "com.inqbarna.onboarding.hasVisitedAlertsVC"
-        static let hasVisitedLoginBenefitsVC = "com.inqbarna.onboarding.hasVisitedLoginBenefitsVC"
         static let hasInstalledApp = "com.inqbarna.onboarding.appIsInstalled"
     }
 
