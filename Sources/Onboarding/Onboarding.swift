@@ -3,17 +3,18 @@ import UIKit
 public class Onboarding: NSObject {
     private var activeSteps: [OnboardingStep]?
     private var userSteps: [OnboardingStep]
+    private var config: OnboardingConfiguration
 
     public weak var onboardingRootViewController: OnboardingRootViewController?
 
-    public init(steps: [OnboardingStep]) {
+    public init(steps: [OnboardingStep], configuration: OnboardingConfiguration) {
         userSteps = steps
+        config = configuration
         super.init()
     }
 
     private override init() {
-        userSteps = []
-        assertionFailure("should initalize Onboarding with some Onboarding steps")
+        fatalError("have to initialize with init(steps: configuration:)")
     }
 
     public func checkIfShouldPresent(_ completion: @escaping ((Bool) -> Void)) {
@@ -68,7 +69,7 @@ public class Onboarding: NSObject {
         userSteps.forEach {
             group.enter()
             let step = $0
-            step.shouldDisplay { isActive in
+            step.shouldDisplay(config: config) { isActive in
                 if isActive {
                     self.activeSteps?.append(step)
                 }
@@ -87,8 +88,9 @@ public class Onboarding: NSObject {
     }
 
     private func onboardingRootNavigationController() -> UINavigationController {
-        let onboardingRootVC = OnboardingRootViewController()
-        onboardingRootVC.steps = activeSteps ?? []
+        let onboardingRootVC = OnboardingRootViewController(
+            config: config,
+            onboardingSteps: activeSteps ?? [])
 
         let navController = UINavigationController(rootViewController: onboardingRootVC)
         onboardingRootViewController = onboardingRootVC
@@ -105,7 +107,6 @@ public class Onboarding: NSObject {
 
         vc.preferredContentSize = CGSize(width: 600.0, height: 800.0)
     }
-
 }
 
 extension Onboarding: UIPopoverPresentationControllerDelegate {

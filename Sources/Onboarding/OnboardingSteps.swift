@@ -21,12 +21,12 @@ public enum OnboardingStep: Equatable {
         static let whatsNewFileExtension = "json"
     }
 
-    func shouldDisplay(completion: @escaping ((Bool) -> Void)) {
+    func shouldDisplay(config: OnboardingConfiguration, completion: @escaping ((Bool) -> Void)) {
         switch self {
         case .blocking(let minVersion, _):
             completion(shouldBlockAppVersion(minVersion))
         case .whatsNew:
-            completion(shouldDisplayWhatsNew())
+            completion(shouldDisplayWhatsNew(config: config))
         case .custom:
             completion(true)
         }
@@ -41,13 +41,13 @@ public enum OnboardingStep: Equatable {
         }
     }
 
-    func viewController(action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
+    func viewController(config: OnboardingConfiguration, action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
         switch self {
         case .blocking(let minVersion, let appStoreString):
-            return OnboardingSceneBuilder.blockingVersionVC(minVersion, appStoreUrlString: appStoreString) // No action to respond to here..
+            return OnboardingSceneBuilder.blockingVersionVC(minVersion, config: config, appStoreUrlString: appStoreString) // No action to respond to here..
         case .whatsNew:
-            if let whatsNew = whatsNewForCurrentVersion() {
-                return OnboardingSceneBuilder.whatsNewVC(for: whatsNew) {
+            if let whatsNew = whatsNewForCurrentVersion(config: config) {
+                return OnboardingSceneBuilder.whatsNewVC(for: whatsNew, config: config) {
                     StartupValues.setAsInstalled()
                     action(self, true)
                 }
@@ -56,38 +56,29 @@ public enum OnboardingStep: Equatable {
             return vc
         }
 
-        assertionFailure("should have treated this already")
         return UIViewController()
     }
 
-    func viewBackgroundColor() -> UIColor {
-        return OnboardingConfiguration().backgroundColor(forStep: self)
+    private func shouldDisplayWhatsNew(config: OnboardingConfiguration) -> Bool {
+        return isCleanInstall() || hasUpdatedNonPatchVersion(config: config)
     }
 
-    func hidesNavigationBar() -> Bool {
-        return OnboardingConfiguration().hidesNavigationBar(forStep: self)
-    }
-
-    private func shouldDisplayWhatsNew() -> Bool {
-        return isCleanInstall() || hasUpdatedNonPatchVersion()
-    }
-
-    private func hasUpdatedNonPatchVersion() -> Bool {
-        return whatsNewForCurrentVersion() != nil && !hasDisplayedWhatsNewForCurrentVersion()
+    private func hasUpdatedNonPatchVersion(config: OnboardingConfiguration) -> Bool {
+        return whatsNewForCurrentVersion(config: config) != nil && !hasDisplayedWhatsNewForCurrentVersion()
     }
 
     private func isCleanInstall() -> Bool {
         return StartupValues.isCleanInstall()
     }
 
-    private func whatsNewForCurrentVersion() -> WhatsNew? {
+    private func whatsNewForCurrentVersion(config: OnboardingConfiguration) -> WhatsNew? {
         let version = WhatsNew.Version.current()
         let versionString = version.description
         let isFreshInstall = StartupValues.isCleanInstall()
 
         var fileName = FileConstants.whatsNewFileName + versionString
         if isFreshInstall {
-            fileName = OnboardingConfiguration().firstInstallWhatsNewJsonName
+            fileName = config.firstInstallWhatsNewJsonName
         }
 
         var whatsNewWithImageString: WhatsNewWithImageStrings?

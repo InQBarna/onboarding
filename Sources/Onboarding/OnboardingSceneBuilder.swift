@@ -13,17 +13,15 @@ public typealias PrimaryActionSelected = Bool
 public typealias OnboardingViewController = WhatsNewViewController
 
 public class OnboardingSceneBuilder {
-    static func whatsNewVC(for whatsNew: WhatsNew, action: @escaping (() -> Void)) -> WhatsNewViewController? {
+    static func whatsNewVC(for whatsNew: WhatsNew, config: OnboardingConfiguration, action: @escaping (() -> Void)) -> WhatsNewViewController? {
         return WhatsNewViewController(
             whatsNew: whatsNew,
-            configuration: defaultCustomizedConfiguration(action),
+            configuration: defaultCustomizedConfiguration(config: config, action),
             versionStore: WhatsNewVersionUserDefaultsStore()
         )
     }
 
-    
-
-    static func blockingVersionVC(_ minVersion: String, appStoreUrlString: String) -> WhatsNewViewController {
+    static func blockingVersionVC(_ minVersion: String, config: OnboardingConfiguration, appStoreUrlString: String) -> WhatsNewViewController {
         let appVersion = Bundle.main.currentAppVersion ?? "-"
 
         let message = String(format: NSLocalizedString("La versión de la aplicación %@ ya no está soportada. Por favor, actualiza a la versión %@ o superior.", comment: ""), arguments: [appVersion, minVersion])
@@ -39,7 +37,7 @@ public class OnboardingSceneBuilder {
             ]
         )
 
-        var configuration = defaultCustomizedConfiguration {
+        var configuration = defaultCustomizedConfiguration(config: config) {
             OnboardingSceneBuilder.launchAppStore(appStoreUrlString)
         }
         configuration.completionButton.title = NSLocalizedString("Actualizar", comment: "")
@@ -58,26 +56,25 @@ public class OnboardingSceneBuilder {
         UIApplication.shared.open(appStoreURL, options: [:], completionHandler: nil)
     }
 
-    public static func defaultCustomizedConfiguration(_ action: @escaping (() -> Void)) -> WhatsNewViewController.Configuration {
+    public static func defaultCustomizedConfiguration(config: OnboardingConfiguration, _ action: @escaping (() -> Void)) -> WhatsNewViewController.Configuration {
         var configuration = WhatsNewViewController.Configuration()
 
         let myTheme = WhatsNewViewController.Theme { configuration in
-            let onboardingConfig = OnboardingConfiguration()
-            configuration.backgroundColor = onboardingConfig.backgroundColor
-            configuration.titleView.titleColor = onboardingConfig.titleColor
-            configuration.titleView.titleFont = onboardingConfig.titleFont
+//            configuration.backgroundColor = config.backgroundColor
+            configuration.titleView.titleColor = config.titleColor
+            configuration.titleView.titleFont = config.titleFont
 
-            configuration.itemsView.titleFont = onboardingConfig.primaryFont
-            configuration.itemsView.titleColor = onboardingConfig.primaryTextColor
-            configuration.itemsView.subtitleFont = onboardingConfig.secondaryFont
-            configuration.itemsView.subtitleColor = onboardingConfig.secondaryTextColor
+            configuration.itemsView.titleFont = config.primaryFont
+            configuration.itemsView.titleColor = config.primaryTextColor
+            configuration.itemsView.subtitleFont = config.secondaryFont
+            configuration.itemsView.subtitleColor = config.secondaryTextColor
             configuration.itemsView.imageSize = .original
             configuration.itemsView.autoTintImage = true
 
-            configuration.completionButton.backgroundColor = onboardingConfig.completionButtonBackgroundColor
-            configuration.completionButton.titleColor = onboardingConfig.completionButtonTitleColor
-            configuration.completionButton.titleFont = onboardingConfig.completionButtonTitleFont
-            configuration.completionButton.insets = onboardingConfig.completionButtonInsets
+            configuration.completionButton.backgroundColor = config.completionButtonBackgroundColor
+            configuration.completionButton.titleColor = config.completionButtonTitleColor
+            configuration.completionButton.titleFont = config.completionButtonTitleFont
+            configuration.completionButton.insets = config.completionButtonInsets
             configuration.completionButton.title = NSLocalizedString("Continúa", comment: "")
         }
 

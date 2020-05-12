@@ -3,7 +3,7 @@ import UIKit
 import WhatsNewKit
 
 public class OnboardingRootViewController: UIViewController {
-    public var steps = [OnboardingStep]()
+    public var steps: [OnboardingStep]
     public var activeStep = 0
 
     struct Constants {
@@ -25,6 +25,17 @@ public class OnboardingRootViewController: UIViewController {
     }()
 
     var onFinishOnboarding: (() -> Void)?
+    private var configuration: OnboardingConfiguration
+
+    init(config: OnboardingConfiguration, onboardingSteps: [OnboardingStep]) {
+        configuration = config
+        steps = onboardingSteps
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,12 +47,10 @@ public class OnboardingRootViewController: UIViewController {
     }
 
     public override var preferredStatusBarStyle: UIStatusBarStyle {
-        return OnboardingConfiguration().statusBarStyle ?? .default
+        return configuration.statusBarStyle ?? .default
     }
 
     private func setupView() {
-        view.backgroundColor = OnboardingConfiguration().backgroundColor
-
         [pageControl, containerView].forEach {
             view.addSubview($0)
         }
@@ -49,7 +58,7 @@ public class OnboardingRootViewController: UIViewController {
         pageControl.numberOfPages = steps.count
         pageControl.currentPage = activeStep
 
-        OnboardingConfiguration().configureNavBar(navigationController)
+        configuration.configureNavBar(navigationController)
     }
 
     private func setupConstraints() {
@@ -71,8 +80,9 @@ public class OnboardingRootViewController: UIViewController {
 
     private func displayActiveStep() {
         if let firstVC = makeViewController(at: activeStep) {
-            view.backgroundColor = steps[activeStep].viewBackgroundColor()
-            navigationController?.setNavigationBarHidden(steps[activeStep].hidesNavigationBar(), animated: false)
+            let step = steps[activeStep]
+            view.backgroundColor = configuration.backgroundColor(forStep: step)
+            navigationController?.setNavigationBarHidden(configuration.hidesNavigationBar(forStep: step), animated: false)
 
             displayVC(firstVC)
         } else {
@@ -123,7 +133,7 @@ public class OnboardingRootViewController: UIViewController {
             }
         }
 
-        return step.viewController(action: action)
+        return step.viewController(config: configuration, action: action)
     }
 }
 
