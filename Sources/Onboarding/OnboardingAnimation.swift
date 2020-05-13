@@ -8,9 +8,9 @@
 
 import UIKit
 
-class OnboardingAnimation {
+public class OnboardingAnimation {
     // Same animation as the WhatsNewKit .slideUp
-    static func animateSlidingUp(_ views: [UIView]) {
+    public static func animateSlidingUp(_ views: [UIView]) {
         let delay: TimeInterval = 0.2
         views.enumerated().forEach { (
             OnboardingAnimation.animateSlidingUp($0.element, delay: delay + TimeInterval($0.offset) * 0.1)
