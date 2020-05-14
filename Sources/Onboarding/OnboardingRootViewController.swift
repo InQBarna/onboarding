@@ -47,7 +47,7 @@ public class OnboardingRootViewController: UIViewController {
     }
 
     public override var preferredStatusBarStyle: UIStatusBarStyle {
-        return configuration.statusBarStyle ?? .default
+        return configuration.statusBarStyle ?? .lightContent
     }
 
     private func setupView() {
@@ -58,7 +58,7 @@ public class OnboardingRootViewController: UIViewController {
         pageControl.numberOfPages = steps.count
         pageControl.currentPage = activeStep
 
-        configuration.configureNavBar(navigationController)
+        configuration.configureNavBar(self)
     }
 
     private func setupConstraints() {

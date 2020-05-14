@@ -23,6 +23,6 @@ public protocol OnboardingConfiguration {
     var statusBarStyle: UIStatusBarStyle?  { get }
 
     func backgroundColor(forStep: OnboardingStep) -> UIColor
-    func configureNavBar(_ navigationController: UINavigationController?)
+    func configureNavBar(_ viewController: UIViewController?)
     func hidesNavigationBar(forStep step: OnboardingStep) -> Bool
 }
