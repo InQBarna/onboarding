@@ -6,6 +6,11 @@ public class Onboarding: NSObject {
     private var config: OnboardingConfiguration
 
     public weak var onboardingRootViewController: OnboardingRootViewController?
+    public var activeStep: OnboardingStep? {
+        guard let steps = activeSteps,
+            let index = onboardingRootViewController?.activeStep else { return nil }
+        return steps[index]
+    }
 
     public init(steps: [OnboardingStep], configuration: OnboardingConfiguration) {
         userSteps = steps

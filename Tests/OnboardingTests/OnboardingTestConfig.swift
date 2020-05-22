@@ -66,7 +66,7 @@ class OnboardingTestConfigSpy: OnboardingConfiguration {
         return .black
     }
 
-    func configureNavBar(_ navigationController: UINavigationController?) {
+    func configureNavBar(_ viewController: UIViewController?) {
         configureNavBarCalled = true
     }
 
