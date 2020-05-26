@@ -24,10 +24,10 @@ public class OnboardingSceneBuilder {
     static func blockingVersionVC(_ minVersion: String, config: OnboardingConfiguration, appStoreUrlString: String) -> WhatsNewViewController {
         let appVersion = Bundle.main.currentAppVersion ?? "-"
 
-        let message = String(format: NSLocalizedString("La versión de la aplicación %@ ya no está soportada. Por favor, actualiza a la versión %@ o superior.", comment: ""), arguments: [appVersion, minVersion])
+        let message = config.blockingVersionString(withCurrentVersion: appVersion, minVersion: minVersion)
 
         let info = WhatsNew(
-            title: NSLocalizedString("Actualización recomendada", comment: ""),
+            title: config.recommendedUpdateTitle(),
             items: [
                 WhatsNew.Item(
                     title: "",
@@ -40,7 +40,7 @@ public class OnboardingSceneBuilder {
         var configuration = defaultCustomizedConfiguration(config: config) {
             OnboardingSceneBuilder.launchAppStore(appStoreUrlString)
         }
-        configuration.completionButton.title = NSLocalizedString("Actualizar", comment: "")
+        configuration.completionButton.title = config.updateButtontTitle()
 
         return WhatsNewViewController(
             whatsNew: info,
@@ -75,7 +75,7 @@ public class OnboardingSceneBuilder {
             configuration.completionButton.titleColor = config.completionButtonTitleColor
             configuration.completionButton.titleFont = config.completionButtonTitleFont
             configuration.completionButton.insets = config.completionButtonInsets
-            configuration.completionButton.title = NSLocalizedString("Continúa", comment: "")
+            configuration.completionButton.title = config.continueButtonTitle()
         }
 
         configuration.apply(theme: myTheme)

@@ -25,4 +25,9 @@ public protocol OnboardingConfiguration {
     func backgroundColor(forStep: OnboardingStep) -> UIColor
     func configureNavBar(_ viewController: UIViewController?)
     func hidesNavigationBar(forStep step: OnboardingStep) -> Bool
+
+    func blockingVersionString(withCurrentVersion: String, minVersion: String) -> String
+    func recommendedUpdateTitle() -> String
+    func updateButtontTitle() -> String
+    func continueButtonTitle() -> String
 }

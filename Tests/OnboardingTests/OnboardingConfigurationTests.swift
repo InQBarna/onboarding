@@ -121,5 +121,14 @@ final class OnboardingConfigurationTests: XCTestCase {
 
         XCTAssert(spy.firstInstallWhatsNewJsonNameCalled)
     }
+
+    func testOnboardingBlockingReadsStringsFromConfiguration() {
+        _ = OnboardingSceneBuilder.blockingVersionVC("10.0.0", config: spy, appStoreUrlString: "www.")
+
+        XCTAssertTrue(spy.blockingStringCalled)
+        XCTAssertTrue(spy.recommendedUpdateStringCalled)
+        XCTAssertTrue(spy.updateButtonStringCalled)
+        XCTAssertTrue(spy.continueButtonStringCalled)
+    }
 }
 

@@ -75,6 +75,26 @@ class OnboardingTestConfigSpy: OnboardingConfiguration {
         return false
     }
 
+    func blockingVersionString(withCurrentVersion: String, minVersion: String) -> String {
+        blockingStringCalled = true
+        return "-"
+    }
+
+    func recommendedUpdateTitle() -> String {
+        recommendedUpdateStringCalled = true
+        return "-"
+    }
+
+    func updateButtontTitle() -> String {
+        updateButtonStringCalled = true
+        return "-"
+    }
+
+    func continueButtonTitle() -> String {
+        continueButtonStringCalled = true
+        return "-"
+    }
+
     var backgroundColorForStepCalled = false
     var configureNavBarCalled = false
     var hidesNavBarCalled = false
@@ -91,4 +111,8 @@ class OnboardingTestConfigSpy: OnboardingConfiguration {
     var firstInstallWhatsNewJsonNameCalled = false
     var onboardingTopImageCalled = false
     var statusBarStyleCalled = false
+    var blockingStringCalled = false
+    var recommendedUpdateStringCalled = false
+    var updateButtonStringCalled = false
+    var continueButtonStringCalled = false
 }
