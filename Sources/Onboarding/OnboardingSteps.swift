@@ -12,7 +12,6 @@ import WhatsNewKit
 public enum OnboardingStep: Equatable {
     case blocking(minVersion: String, appStoreUrlString: String)
     case whatsNew
-    ///provides the default (but customizable) WhatsNewKit design
     case custom(identifier: String, vc: UIViewController)
 
     struct FileConstants {
@@ -46,7 +45,7 @@ public enum OnboardingStep: Equatable {
         case .blocking(let minVersion, let appStoreString):
             return OnboardingSceneBuilder.blockingVersionVC(minVersion, config: config, appStoreUrlString: appStoreString) // No action to respond to here..
         case .whatsNew:
-            if let whatsNew = whatsNewForCurrentVersion(config: config) {
+            if let whatsNew = whatsNewForCurrentVersion(config: config) ?? pendingWhatsNewToDisplaySinceLastInstalled() {
                 return OnboardingSceneBuilder.whatsNewVC(for: whatsNew, config: config) {
                     StartupValues.setAsInstalled()
                     action(self, true)
@@ -60,11 +59,62 @@ public enum OnboardingStep: Equatable {
     }
 
     private func shouldDisplayWhatsNew(config: OnboardingConfiguration) -> Bool {
-        return isCleanInstall() || hasUpdatedNonPatchVersion(config: config)
+           return isCleanInstall()
+                 || hasUpdatedNonPatchVersionWithWhatsNewFile(config: config)
+                 || hasSomeWhatsNewPendingSinceLastInstalled()
     }
 
-    private func hasUpdatedNonPatchVersion(config: OnboardingConfiguration) -> Bool {
+    private func hasUpdatedNonPatchVersionWithWhatsNewFile(config: OnboardingConfiguration) -> Bool {
         return whatsNewForCurrentVersion(config: config) != nil && !hasDisplayedWhatsNewForCurrentVersion()
+    }
+
+    private func hasSomeWhatsNewPendingSinceLastInstalled() -> Bool {
+        return pendingWhatsNewToDisplaySinceLastInstalled() != nil
+    }
+
+    private func pendingWhatsNewToDisplaySinceLastInstalled() -> WhatsNew? {
+        guard let lastWhatsNewDisplayed = WhatsNewVersionUserDefaultsStore().lastWhatsNewDisplayedVersion() else {
+            // there should be something here - if not, that means we're coming from 6.x.x and this should be considered as a clean install
+            return nil
+        }
+
+        return whatsNewFileInBetweenCurrent(andVersion: lastWhatsNewDisplayed)
+    }
+
+    private func whatsNewFileInBetweenCurrent(andVersion latestDisplayedWhatsNewVersion: WhatsNew.Version) -> WhatsNew? {
+        let currentVersion = WhatsNew.Version.current()
+        let majorVersion = currentVersion.major
+        var oldestPossibleVersion = latestDisplayedWhatsNewVersion
+
+        //only search for whatsNew files of the same major version
+        if latestDisplayedWhatsNewVersion.major < majorVersion {
+            oldestPossibleVersion = WhatsNew.Version(major: majorVersion, minor: 0, patch: 0)
+        }
+
+        var minor = currentVersion.minor
+        var patch = currentVersion.patch
+
+        while minor >= 0 {
+
+            while patch >= 0 {
+                let version = WhatsNew.Version(major: majorVersion, minor: minor, patch: patch)
+                if let file = whatsNew(for: version) {
+                    // found it - now change its version to the current one to mark it as displayed correctly
+                    return WhatsNew(version: WhatsNew.Version.current(),
+                                    title: file.title,
+                                    items: file.items)
+                } else if version == oldestPossibleVersion {
+                    return nil
+                } else {
+                    patch -= 1
+                }
+            }
+
+            minor -= 1
+            patch = 9
+        }
+
+        return nil
     }
 
     private func isCleanInstall() -> Bool {
@@ -72,15 +122,33 @@ public enum OnboardingStep: Equatable {
     }
 
     private func whatsNewForCurrentVersion(config: OnboardingConfiguration) -> WhatsNew? {
-        let version = WhatsNew.Version.current()
-        let versionString = version.description
-        let isFreshInstall = StartupValues.isCleanInstall()
+        if StartupValues.isCleanInstall() {
+            let fileName = config.firstInstallWhatsNewJsonName
+            let whatsNewFile = whatsNew(for: fileName)
 
-        var fileName = FileConstants.whatsNewFileName + versionString
-        if isFreshInstall {
-            fileName = config.firstInstallWhatsNewJsonName
+            //pass correct version if it's a clean install - so it is marked as already seen by WhatsNewKit
+            if let title = whatsNewFile?.title,
+                let items = whatsNewFile?.items {
+                return WhatsNew(
+                    version: WhatsNew.Version.current(),
+                    title: title,
+                    items: items)
+            }
+        } else {
+            return whatsNew(for: WhatsNew.Version.current())
         }
 
+        return nil
+    }
+
+    private func whatsNew(for version: WhatsNew.Version) -> WhatsNew? {
+        let versionString = version.description
+        let fileName = FileConstants.whatsNewFileName + versionString
+
+        return whatsNew(for: fileName)
+    }
+
+    private func whatsNew(for fileName: String) -> WhatsNew? {
         var whatsNewWithImageString: WhatsNewWithImageStrings?
         if let path = Bundle.main.path(forResource: fileName, ofType: FileConstants.whatsNewFileExtension) {
             if let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: []),
@@ -89,20 +157,7 @@ public enum OnboardingStep: Equatable {
             }
         }
 
-        var whatsNew = whatsNewWithImageString?.toWhatsNew()
-
-        // pass correct version if it's a clean install - so it is marked as already seen by WhatsNewKit
-        if isFreshInstall,
-            let title = whatsNew?.title,
-            let items = whatsNew?.items {
-            whatsNew = WhatsNew(
-                version: version,
-                title: title,
-                items: items
-            )
-        }
-
-        return whatsNew
+        return whatsNewWithImageString?.toWhatsNew()
     }
 
     private func hasDisplayedWhatsNewForCurrentVersion() -> Bool {

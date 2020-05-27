@@ -25,3 +25,16 @@ Display a custom UIViewController as an onboardings step. The custom ViewControl
 ```moveToNextStep()```
 
 You can create and pass an OnboardingViewController with a WhatsNew struct to preserve the UI consistency with the default presented ViewControllers. OnboardingSceneBuilder provides a defaultCustomizedConfiguration function that configures elements accordingly.  
+
+--- 
+## TODO: 
+Should write some higher level tests for : 
+
+    func testDoesNotDisplayOnboardingWithBlockingStepVersionLowerThanCurrent() {}
+    func testCreatesWhatsNewVCForBlockingStep() {}
+    func testCreatesWhatsNewVCForWhatsNewStep() {}
+    func testDisplayOnboardingWithMatchingVersionFileAndFirstTimeLaunch() {}
+    func testDoesNotDisplayOnboardingWithNonMatchingVersionFileAndFirstTimeLaunch() {}
+    func testDoesNotDisplayOnboardingWithMatchingVersionFileAndSecondTimeLaunch() {}
+    func testDisplayOnboardingWithMatchingPendingPreviousVersionFileAndFirstTimeLaunch() {}
+    func testMarksDisplayedWhatsNewFileVersion() {}

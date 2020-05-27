@@ -12,6 +12,7 @@ import WhatsNewKit
 struct WhatsNewVersionUserDefaultsStore: WhatsNewVersionStore {
     struct Constants {
         static let versionNumberDefaultsKey = "com.grupoGodo.whatsnewDisplay.version"
+        static let lastInstalleđVersionDefaultsKey = "com.grupoGodo.whatsnewDisplay.lastVersion"
     }
 
     private func defaultsKey(for version: WhatsNew.Version) -> String {
@@ -24,5 +25,14 @@ struct WhatsNewVersionUserDefaultsStore: WhatsNewVersionStore {
 
     func set(version: WhatsNew.Version) {
         UserDefaults.standard.set(true, forKey: defaultsKey(for: version))
+        UserDefaults.standard.set(version.description, forKey: Constants.lastInstalleđVersionDefaultsKey)
+    }
+
+    func lastWhatsNewDisplayedVersion() -> WhatsNew.Version? {
+        if let storedVersionNumber = UserDefaults.standard.string(forKey: Constants.lastInstalleđVersionDefaultsKey) {
+            return WhatsNew.Version(stringLiteral: storedVersionNumber)
+        } else {
+            return nil
+        }
     }
 }
