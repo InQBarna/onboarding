@@ -1,7 +1,7 @@
 import UIKit
 
 public class Onboarding: NSObject {
-    private var activeSteps: [OnboardingStep]?
+    public var activeSteps: [OnboardingStep]?
     private var userSteps: [OnboardingStep]
     private var config: OnboardingConfiguration
 
@@ -58,8 +58,8 @@ public class Onboarding: NSObject {
         vc.present(onboardingNavController, animated: true, completion: nil)
     }
 
-    public func dismiss() {
-        onboardingRootViewController?.dismiss(animated: true, completion: nil)
+    public func dismiss(completion: @escaping (() -> Void)) {
+        onboardingRootViewController?.dismiss(animated: true, completion: completion)
     }
 
     public func moveToNextStep() {
