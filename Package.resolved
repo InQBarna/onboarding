@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "WhatsNewKit",
+        "repositoryURL": "https://github.com/SvenTiigi/WhatsNewKit.git",
+        "state": {
+          "branch": null,
+          "revision": "41319af1696c9a8c95f0f68cc24be025fbb34b96",
+          "version": "1.3.3"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,6 @@
+use_frameworks!
+target 'onboard_Tests' do
+  pod 'onboard', :path => '../'
+  
+  
+end

@@ -1,0 +1,16 @@
+PODS:
+  - onboard (0.1.0)
+
+DEPENDENCIES:
+  - onboard (from `../`)
+
+EXTERNAL SOURCES:
+  onboard:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  onboard: 4093cc226e53a3c9e489866fe0ce01338dccff24
+
+PODFILE CHECKSUM: 40b4df5fe28e9c94b91b46276668722f2b42f6e0
+
+COCOAPODS: 1.9.1
