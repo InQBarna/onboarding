@@ -22,5 +22,5 @@ Wraps WhatsNewKit to do version checking and display:
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'WhatsNewKit', '~> 1.3.0'
+  s.dependency 'WhatsNewKit'
 end
