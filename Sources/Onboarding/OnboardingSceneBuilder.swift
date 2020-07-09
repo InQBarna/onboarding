@@ -33,7 +33,7 @@ public class OnboardingSceneBuilder {
                     title: "",
                     subtitle: message,
                     image: nil
-                ),
+                )
             ]
         )
 
@@ -48,7 +48,7 @@ public class OnboardingSceneBuilder {
         )
     }
 
-    static func launchAppStore(_  appStoreUrlString: String) {
+    static func launchAppStore(_ appStoreUrlString: String) {
         guard let appStoreURL = URL(string: appStoreUrlString) else {
             assertionFailure()
             return

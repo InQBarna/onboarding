@@ -22,7 +22,7 @@ public enum OnboardingStep: Equatable {
 
     func shouldDisplay(config: OnboardingConfiguration, completion: @escaping ((Bool) -> Void)) {
         switch self {
-        case .blocking(let minVersion, _):
+        case let .blocking(minVersion, _):
             completion(shouldBlockAppVersion(minVersion))
         case .whatsNew:
             completion(shouldDisplayWhatsNew(config: config))
@@ -42,7 +42,7 @@ public enum OnboardingStep: Equatable {
 
     func viewController(config: OnboardingConfiguration, action: @escaping ((OnboardingStep, Any) -> Void)) -> UIViewController? {
         switch self {
-        case .blocking(let minVersion, let appStoreString):
+        case let .blocking(minVersion, appStoreString):
             return OnboardingSceneBuilder.blockingVersionVC(minVersion, config: config, appStoreUrlString: appStoreString) // No action to respond to here..
         case .whatsNew:
             if let whatsNew = whatsNewForCurrentVersion(config: config) ?? pendingWhatsNewToDisplaySinceLastInstalled() {
@@ -51,7 +51,7 @@ public enum OnboardingStep: Equatable {
                     action(self, true)
                 }
             }
-        case .custom(_, let vc):
+        case let .custom(_, vc):
             return vc
         }
 
@@ -59,9 +59,9 @@ public enum OnboardingStep: Equatable {
     }
 
     private func shouldDisplayWhatsNew(config: OnboardingConfiguration) -> Bool {
-           return isCleanInstall()
-                 || hasUpdatedNonPatchVersionWithWhatsNewFile(config: config)
-                 || hasSomeWhatsNewPendingSinceLastInstalled()
+        return isCleanInstall()
+            || hasUpdatedNonPatchVersionWithWhatsNewFile(config: config)
+            || hasSomeWhatsNewPendingSinceLastInstalled()
     }
 
     private func hasUpdatedNonPatchVersionWithWhatsNewFile(config: OnboardingConfiguration) -> Bool {
@@ -86,7 +86,11 @@ public enum OnboardingStep: Equatable {
         let majorVersion = currentVersion.major
         var oldestPossibleVersion = latestDisplayedWhatsNewVersion
 
-        //only search for whatsNew files of the same major version
+        guard currentVersion != oldestPossibleVersion else {
+            return nil
+        }
+
+        // only search for whatsNew files of the same major version
         if latestDisplayedWhatsNewVersion.major < majorVersion {
             oldestPossibleVersion = WhatsNew.Version(major: majorVersion, minor: 0, patch: 0)
         }
@@ -95,14 +99,15 @@ public enum OnboardingStep: Equatable {
         var patch = currentVersion.patch
 
         while minor >= 0 {
-
             while patch >= 0 {
                 let version = WhatsNew.Version(major: majorVersion, minor: minor, patch: patch)
                 if let file = whatsNew(for: version) {
                     // found it - now change its version to the current one to mark it as displayed correctly
-                    return WhatsNew(version: WhatsNew.Version.current(),
-                                    title: file.title,
-                                    items: file.items)
+                    return WhatsNew(
+                        version: WhatsNew.Version.current(),
+                        title: file.title,
+                        items: file.items
+                    )
                 } else if version == oldestPossibleVersion {
                     return nil
                 } else {
@@ -126,13 +131,14 @@ public enum OnboardingStep: Equatable {
             let fileName = config.firstInstallWhatsNewJsonName
             let whatsNewFile = whatsNew(for: fileName)
 
-            //pass correct version if it's a clean install - so it is marked as already seen by WhatsNewKit
+            // pass correct version if it's a clean install - so it is marked as already seen by WhatsNewKit
             if let title = whatsNewFile?.title,
                 let items = whatsNewFile?.items {
                 return WhatsNew(
                     version: WhatsNew.Version.current(),
                     title: title,
-                    items: items)
+                    items: items
+                )
             }
         } else {
             return whatsNew(for: WhatsNew.Version.current())

@@ -20,7 +20,7 @@ public protocol OnboardingConfiguration {
     var completionButtonInsets: UIEdgeInsets { get }
     var firstInstallWhatsNewJsonName: String { get }
     var onboardingTopImage: UIImage? { get }
-    var statusBarStyle: UIStatusBarStyle?  { get }
+    var statusBarStyle: UIStatusBarStyle? { get }
 
     func backgroundColor(forStep: OnboardingStep) -> UIColor
     func configureNavBar(_ viewController: UIViewController?)

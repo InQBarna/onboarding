@@ -25,6 +25,8 @@ public class OnboardingRootViewController: UIViewController {
     }()
 
     var onFinishOnboarding: (() -> Void)?
+    var onDisplayStep: ((OnboardingStep) -> Void)?
+
     private var configuration: OnboardingConfiguration
 
     init(config: OnboardingConfiguration, onboardingSteps: [OnboardingStep]) {
@@ -33,11 +35,11 @@ public class OnboardingRootViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         setupView()
@@ -46,7 +48,7 @@ public class OnboardingRootViewController: UIViewController {
         displayActiveStep()
     }
 
-    public override var preferredStatusBarStyle: UIStatusBarStyle {
+    override public var preferredStatusBarStyle: UIStatusBarStyle {
         return configuration.statusBarStyle ?? .lightContent
     }
 
@@ -85,6 +87,8 @@ public class OnboardingRootViewController: UIViewController {
             navigationController?.setNavigationBarHidden(configuration.hidesNavigationBar(forStep: step), animated: false)
 
             displayVC(firstVC)
+
+            onDisplayStep?(step)
         } else {
             finishOnboarding()
         }
@@ -124,7 +128,7 @@ public class OnboardingRootViewController: UIViewController {
     private func makeViewController(at index: Int) -> UIViewController? {
         let step = steps[index]
 
-        let action: ((OnboardingStep, Any) -> Void) = { (step, response) in
+        let action: ((OnboardingStep, Any) -> Void) = { step, _ in
             switch step {
             case .whatsNew:
                 self.moveToNextStep()

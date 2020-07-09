@@ -11,7 +11,7 @@ import Foundation
     struct Constants {
         static let hasInstalledApp = "com.inqbarna.onboarding.appIsInstalled"
     }
-    
+
     static func isCleanInstall() -> Bool {
         return !UserDefaults.standard.bool(forKey: Constants.hasInstalledApp)
     }

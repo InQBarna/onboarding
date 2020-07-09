@@ -42,7 +42,7 @@ public class Onboarding: NSObject {
         }
     }
 
-    public func present(over vc: UIViewController, finish: @escaping (() -> Void)) {
+    public func present(over vc: UIViewController, finish: @escaping (() -> Void), onStepDisplay: @escaping ((OnboardingStep) -> Void)) {
         let onboardingNavController = onboardingRootNavigationController()
 
         if vc.view.traitCollection.horizontalSizeClass == .compact {
@@ -53,6 +53,10 @@ public class Onboarding: NSObject {
 
         onboardingRootViewController?.onFinishOnboarding = {
             finish()
+        }
+
+        onboardingRootViewController?.onDisplayStep = { step in
+            onStepDisplay(step)
         }
 
         vc.present(onboardingNavController, animated: true, completion: nil)
