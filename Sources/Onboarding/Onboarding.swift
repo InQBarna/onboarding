@@ -18,7 +18,7 @@ public class Onboarding: NSObject {
         super.init()
     }
 
-    private override init() {
+    override private init() {
         fatalError("have to initialize with init(steps: configuration:)")
     }
 
@@ -48,7 +48,7 @@ public class Onboarding: NSObject {
         if vc.view.traitCollection.horizontalSizeClass == .compact {
             onboardingNavController.modalPresentationStyle = .fullScreen
         } else {
-            self.configurePopoverPresentation(onboardingNavController, over: vc)
+            configurePopoverPresentation(onboardingNavController, over: vc)
         }
 
         onboardingRootViewController?.onFinishOnboarding = {
@@ -95,9 +95,10 @@ public class Onboarding: NSObject {
     private func onboardingRootNavigationController() -> UINavigationController {
         let onboardingRootVC = OnboardingRootViewController(
             config: config,
-            onboardingSteps: activeSteps ?? [])
+            onboardingSteps: activeSteps ?? []
+        )
 
-        let navController = UINavigationController(rootViewController: onboardingRootVC)
+        let navController = OnboardingNavigationController(rootViewController: onboardingRootVC, statusBarStyle: config.statusBarStyle ?? .default)
         onboardingRootViewController = onboardingRootVC
 
         return navController
@@ -115,17 +116,18 @@ public class Onboarding: NSObject {
 }
 
 extension Onboarding: UIPopoverPresentationControllerDelegate {
-    public func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
+    public func presentationControllerShouldDismiss(_: UIPresentationController) -> Bool {
         return false
     }
 
-    public func popoverPresentationController(_ popoverPresentationController: UIPopoverPresentationController, willRepositionPopoverTo rect: UnsafeMutablePointer<CGRect>, in view: AutoreleasingUnsafeMutablePointer<UIView>) {
+    public func popoverPresentationController(_ popoverPresentationController: UIPopoverPresentationController, willRepositionPopoverTo rect: UnsafeMutablePointer<CGRect>, in _: AutoreleasingUnsafeMutablePointer<UIView>) {
         let preferredContentSize = popoverPresentationController.presentedViewController.preferredContentSize
         let viewFrame = popoverPresentationController.presentingViewController.view.frame
         rect.pointee = CGRect(
             x: viewFrame.midX - preferredContentSize.width / 2.0,
             y: viewFrame.midY - preferredContentSize.height / 2.0,
             width: preferredContentSize.width,
-            height: preferredContentSize.height)
+            height: preferredContentSize.height
+        )
     }
 }
