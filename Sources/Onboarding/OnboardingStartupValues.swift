@@ -7,12 +7,12 @@
 
 import Foundation
 
-@objc class StartupValues: NSObject {
+@objc public class StartupValues: NSObject {
     struct Constants {
         static let hasInstalledApp = "com.inqbarna.onboarding.appIsInstalled"
     }
 
-    static func isCleanInstall() -> Bool {
+    public static func isCleanInstall() -> Bool {
         return !UserDefaults.standard.bool(forKey: Constants.hasInstalledApp)
     }
 

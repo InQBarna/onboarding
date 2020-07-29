@@ -180,7 +180,7 @@ public enum OnboardingStep: Equatable {
     }
 }
 
-extension Bundle {
+public extension Bundle {
     var currentAppVersion: String? {
         return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
     }
