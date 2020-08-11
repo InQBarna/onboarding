@@ -19,6 +19,11 @@ class OnboardingNavigationController: UINavigationController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        statusBarStyle = .default
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return statusBarStyle
     }
