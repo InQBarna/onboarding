@@ -48,6 +48,9 @@ public class Onboarding: NSObject {
         if vc.view.traitCollection.horizontalSizeClass == .compact {
             onboardingNavController.modalPresentationStyle = .fullScreen
         } else {
+            onboardingNavController.view.layer.borderColor = config.primaryTextColor.cgColor
+            onboardingNavController.view.layer.borderWidth = 2
+            onboardingNavController.view.layer.cornerRadius = 15
             configurePopoverPresentation(onboardingNavController, over: vc)
         }
 
@@ -114,6 +117,7 @@ public class Onboarding: NSObject {
         vc.popoverPresentationController?.sourceRect = CGRect(x: over.view.bounds.midX, y: over.view.bounds.midY, width: 0.0, height: 0.0)
         vc.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection()
         vc.popoverPresentationController?.delegate = self
+        vc.popoverPresentationController?.backgroundColor = config.primaryTextColor
 
         vc.preferredContentSize = CGSize(width: 600.0, height: 800.0)
     }

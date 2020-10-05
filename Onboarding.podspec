@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Onboarding'
-  s.version          = '1.0.5'
+  s.version          = '1.0.6'
   s.summary          = 'Helper pod for building app onboarding with multiple steps and version checking'
   s.swift_version    = '5.1'
 
