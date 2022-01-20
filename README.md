@@ -4,6 +4,9 @@ Package that displays a customizable Onboarding with various default and custom 
 Uses WhatsNewKit package to handle the version checking and to display the default UI for each onboarding step.
 
 ---
+## Version 2.0 drops Cocoapods support - as WhatsNewKit 2.0 does.  
+
+---
 ## Default steps 
 
 ##### Blocking screen
